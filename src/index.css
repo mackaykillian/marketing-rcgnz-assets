@@ -46,6 +46,30 @@
   font-display: swap;
 }
 
+/*
+ * 16:9 scaling. The frame keeps a strict 16:9 box at whatever width it's given;
+ * the stage is authored at a fixed 1920×1080 (matching Figma 1:1) and scaled to
+ * fill the frame via `transform: scale(...)`. The scale factor is a unitless
+ * number set by the `useFitScale` hook (CSS can't derive a unitless ratio from a
+ * container width, so a small ResizeObserver computes frameWidth / 1920).
+ */
+@layer components {
+  .signage-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+  .signage-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: top left;
+  }
+}
+
 html,
 body,
 #root {

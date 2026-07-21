@@ -1,32 +1,81 @@
-# React + TypeScript + Vite
+# marketing-rcgnz-assets
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Digital signage for the **RCGNZ Summit**. The `SignageScreen` component is a
+16:9 room display that shows the session currently **live** (or coming up next)
+in a room, alongside a rail of what's live/next in every other room — so an
+attendee who wanders in can orient themselves at a glance.
 
-Currently, two official plugins are available:
+Built with **Vite + React + TypeScript**, **Tailwind CSS v4**, **Storybook**,
+and **Vitest**. Styles come from the Figma _RCGNZ Assets_ design; session data
+comes from the Webflow CMS (mocked for development).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Getting started
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev        # Vite app — renders the SignageScreen (App.tsx)
+npm run storybook  # Storybook — preview all states with room + time controls
+npm run test       # Vitest — schedule-logic unit tests
+npm run typecheck  # tsc, no emit
+npm run build      # type-check + production build
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## How it works
+
+- **16:9 stage.** The component is authored at a fixed 1920×1080 (matching Figma
+  1:1) inside `.signage-frame` / `.signage-stage`, and scaled to fit any width by
+  `useFitScale` (a small ResizeObserver). It always keeps a 16:9 ratio.
+- **Time-driven.** Everything is a pure function of `(sessions, now)` in
+  [`src/lib/sessionSchedule.ts`](src/lib/sessionSchedule.ts). Past sessions drop
+  off; each room shows its live session, else its next upcoming one. Pass a fixed
+  `now` to pin the clock (Storybook/demos) or omit it for a live ticking clock.
+- **Rooms.** The top-left pill cycles rooms; the rail shows every _other_ room.
+- **Tag colors come from the CMS.** `SessionTag` paints each pill with the tag's
+  `tag-color` / `text-color` (Mainstage blue, Social green, Breakout grapefruit…).
+- **LIVE.** A live session shows the grapefruit `LIVE` badge instead of a time.
+
+## Project structure
+
+```
+src/
+  components/SignageScreen/   # SignageScreen + sub-components (Feature, RoomToggle,
+                              # OtherRoomsPanel, SessionTag, LiveBadge, headshots)
+  data/
+    types.ts                  # domain + raw Webflow types
+    mockData.ts               # seeded mock sessions (RCGNZ Summit 2026) — see below
+    sessionService.ts         # SessionService interface + mock impl (default)
+    webflowClient.ts          # live Webflow Data API client (mappers + service)
+  lib/
+    sessionSchedule.ts        # pure schedule logic (+ .test.ts)
+    useNow.ts / useFitScale.ts
+  App.tsx                     # renders only the SignageScreen
+```
+
+## Data: mock now, live later
+
+`sessionService` returns mock data by default and transparently switches to the
+live Webflow CMS when a token is present — no component changes:
+
+```bash
+# .env
+VITE_WEBFLOW_API_TOKEN=your-token
+```
+
+The Webflow Data API is server-authenticated (not CORS-enabled for browsers), so
+in production call it from a server/proxy or at build time; the mapping logic in
+`webflowClient.ts` is reusable wherever the fetch runs.
+
+### Refreshing the mock data
+
+`src/data/mockData.ts` is seeded from **RCGNZ Summit 2026** sessions (tag colors,
+speaker headshots and times are real). It is intentionally **not** auto-synced —
+ask Claude to _"regenerate the RCGNZ mock data"_ to re-pull the latest 2026 items
+via the Webflow MCP. Rooms are assigned during generation because the CMS
+`location` field is currently empty for this event.
+
+## Fonts
+
+The design uses two proprietary Awardco fonts, **Crystal** (headings/body) and
+**Emilio** (italic labels). Drop their `.woff2` files into
+[`public/fonts/`](public/fonts/README.md) and they load automatically; until
+then, close web-safe fallbacks are used.
