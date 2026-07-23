@@ -36,7 +36,7 @@ function SpeakerSlot({
         aria-hidden="true"
       >
         <img
-          src={"../../public/backgrounds/speaker-placeholder.png"}
+          src={`${import.meta.env.BASE_URL}backgrounds/speaker-placeholder.png`}
           className="relative h-full w-full object-cover object-top"
           loading="lazy"
         />
