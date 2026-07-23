@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { RcgnzSession } from '../../data/types';
 import {
   getFeatureForRoom,
@@ -7,7 +7,7 @@ import {
 } from '../../lib/sessionSchedule';
 import { useFitScale } from '../../lib/useFitScale';
 import { useNow } from '../../lib/useNow';
-import { SPEAKER_START_GAP_MS, titleAnimationDurationMs } from './animation';
+import { ANIMATION_REPLAY_MS, SPEAKER_START_GAP_MS, titleAnimationDurationMs } from './animation';
 import { backgroundKeyForSession } from './backgrounds';
 import { FeaturePanel, FeatureSpeakers } from './FeaturePanel';
 import { SessionBackground } from './SessionBackground';
@@ -57,11 +57,20 @@ export function SignageScreen({ sessions, rooms, initialRoom, now: controlledNow
   const headerLabel = feature.status === 'live' ? 'Live now in' : 'Coming next in';
   const cycleRoom = () => setRoomIndex((i) => (roomList.length ? (i + 1) % roomList.length : 0));
 
+  // Re-run the entrance animation on a fixed cadence so the screen keeps feeling
+  // "live", even when the same session stays featured for a while.
+  const [animationCycle, setAnimationCycle] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setAnimationCycle((c) => c + 1), ANIMATION_REPLAY_MS);
+    return () => clearInterval(id);
+  }, []);
+
   // Speakers begin fading in once the title has finished its blur-in. The
-  // `replayKey` remounts the animated pieces when the featured session (or room)
-  // changes, so the entrance animation re-plays — but not on every clock tick.
+  // `replayKey` remounts the animated pieces when the featured session/room
+  // changes OR every `ANIMATION_REPLAY_MS` — so the entrance animation re-plays,
+  // but not on every clock tick.
   const speakerBaseDelayMs = titleAnimationDurationMs(feature.session?.title ?? '') + SPEAKER_START_GAP_MS;
-  const replayKey = `${room}:${feature.session?.id ?? 'none'}`;
+  const replayKey = `${room}:${feature.session?.id ?? 'none'}:${animationCycle}`;
   const bgKey = backgroundKeyForSession(feature.session);
 
   return (
