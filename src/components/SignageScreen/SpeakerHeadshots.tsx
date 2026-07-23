@@ -69,13 +69,11 @@ interface SpeakerHeadshotsProps {
 
 /**
  * The feature's speaker row — always `SLOT_COUNT` slots. Real speakers fill from
- * the left; the rest are heart placeholders so the row never looks sparse. Each
- * slot fades in left-to-right on the shared stagger. Hidden entirely when the
- * session has no speakers at all.
+ * the left; the rest are heart placeholders so the row is always full (even for
+ * sessions with no speakers). Each slot fades in left-to-right on the shared
+ * stagger.
  */
 export function SpeakerHeadshots({ speakers, baseDelayMs = 0 }: SpeakerHeadshotsProps) {
-  if (speakers.length === 0) return null;
-
   const slots: (RcgnzSpeaker | null)[] = Array.from(
     { length: SLOT_COUNT },
     (_, i) => speakers[i] ?? null,
