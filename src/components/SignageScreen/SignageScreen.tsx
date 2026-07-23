@@ -7,7 +7,12 @@ import {
 } from '../../lib/sessionSchedule';
 import { useFitScale } from '../../lib/useFitScale';
 import { useNow } from '../../lib/useNow';
-import { ANIMATION_REPLAY_MS, SPEAKER_START_GAP_MS, titleAnimationDurationMs } from './animation';
+import {
+  ANIMATION_REPLAY_MS,
+  SPEAKER_START_GAP_MS,
+  TIME_TOGGLE_MS,
+  titleAnimationDurationMs,
+} from './animation';
 import { backgroundKeyForSession } from './backgrounds';
 import { FeaturePanel, FeatureSpeakers } from './FeaturePanel';
 import { SessionBackground } from './SessionBackground';
@@ -65,6 +70,14 @@ export function SignageScreen({ sessions, rooms, initialRoom, now: controlledNow
     return () => clearInterval(id);
   }, []);
 
+  // Every few seconds, all session times crossfade between the start–end range
+  // and a "Starting in …" countdown. Driven centrally so they flip in unison.
+  const [showCountdown, setShowCountdown] = useState(false);
+  useEffect(() => {
+    const id = setInterval(() => setShowCountdown((v) => !v), TIME_TOGGLE_MS);
+    return () => clearInterval(id);
+  }, []);
+
   // Speakers begin fading in once the title has finished its blur-in. The
   // `replayKey` remounts the animated pieces when the featured session/room
   // changes OR every `ANIMATION_REPLAY_MS` — so the entrance animation re-plays,
@@ -89,7 +102,7 @@ export function SignageScreen({ sessions, rooms, initialRoom, now: controlledNow
 
         {/* Feature: live/next session, vertically centered in the left column */}
         <div className="absolute left-[83px] top-[424px] -translate-y-1/2">
-          <FeaturePanel key={replayKey} feature={feature} now={now} />
+          <FeaturePanel key={replayKey} feature={feature} now={now} showCountdown={showCountdown} />
         </div>
 
         {/* Speaker headshots pinned near the bottom-left */}
@@ -107,7 +120,7 @@ export function SignageScreen({ sessions, rooms, initialRoom, now: controlledNow
 
         {/* Other-rooms rail */}
         <div className="absolute left-[1292px] top-[213px]">
-          <OtherRoomsPanel feed={feed} />
+          <OtherRoomsPanel feed={feed} now={now} showCountdown={showCountdown} />
         </div>
       </div>
     </div>

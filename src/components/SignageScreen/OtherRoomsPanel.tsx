@@ -1,11 +1,20 @@
 import { MapPinArea } from '@phosphor-icons/react';
 import type { RoomFeature } from '../../lib/sessionSchedule';
-import { formatTimeRange, getPrimaryTag } from '../../lib/sessionSchedule';
+import { getPrimaryTag } from '../../lib/sessionSchedule';
 import { LiveBadge } from './LiveBadge';
 import { SessionTag } from './SessionTag';
+import { SessionTime } from './SessionTime';
 
 /** One card in the "In other rooms …" rail — a room's live-or-next session. */
-function OtherRoomCard({ feature }: { feature: RoomFeature }) {
+function OtherRoomCard({
+  feature,
+  now,
+  showCountdown,
+}: {
+  feature: RoomFeature;
+  now: Date;
+  showCountdown: boolean;
+}) {
   const { room, session, status } = feature;
   const tag = session ? getPrimaryTag(session) : null;
 
@@ -23,9 +32,13 @@ function OtherRoomCard({ feature }: { feature: RoomFeature }) {
           (status === 'live' ? (
             <LiveBadge size="sm" />
           ) : (
-            <span className="whitespace-nowrap font-heading text-h6 tracking-[-0.2px] text-white">
-              {formatTimeRange(session.startDateTime, session.endDateTime)}
-            </span>
+            <SessionTime
+              startIso={session.startDateTime}
+              endIso={session.endDateTime}
+              now={now}
+              showCountdown={showCountdown}
+              className="font-heading text-h6 tracking-[-0.2px] text-white"
+            />
           ))}
       </div>
 
@@ -44,14 +57,21 @@ function OtherRoomCard({ feature }: { feature: RoomFeature }) {
 
 interface OtherRoomsPanelProps {
   feed: RoomFeature[];
+  now: Date;
+  showCountdown: boolean;
 }
 
 /** The stacked cards for every room other than the current one. */
-export function OtherRoomsPanel({ feed }: OtherRoomsPanelProps) {
+export function OtherRoomsPanel({ feed, now, showCountdown }: OtherRoomsPanelProps) {
   return (
     <div className="flex w-[548px] flex-col gap-20">
       {feed.map((feature) => (
-        <OtherRoomCard key={feature.room} feature={feature} />
+        <OtherRoomCard
+          key={feature.room}
+          feature={feature}
+          now={now}
+          showCountdown={showCountdown}
+        />
       ))}
     </div>
   );

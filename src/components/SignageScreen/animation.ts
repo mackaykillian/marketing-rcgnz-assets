@@ -10,6 +10,8 @@ export const SPEAKER_START_GAP_MS = 150;
 export const SPEAKER_STAGGER_MS = 1000;
 /** How often the title + speaker entrance animation replays. */
 export const ANIMATION_REPLAY_MS = 15000;
+/** How often the session time crossfades between the range and the countdown. */
+export const TIME_TOGGLE_MS = 3000;
 
 /**
  * How long the title's blur-in takes end-to-end — used to delay the speakers so
