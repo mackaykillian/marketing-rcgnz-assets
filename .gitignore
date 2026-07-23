@@ -28,3 +28,6 @@ storybook-static
 
 # Local env (Webflow API token, etc.)
 .env
+
+# Netlify CLI local state
+.netlify
