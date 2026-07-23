@@ -95,13 +95,11 @@ export function SignageScreen({ sessions, rooms, initialRoom, now: controlledNow
         {/* Session-type background (behind everything) */}
         <SessionBackground bgKey={bgKey} />
 
-        {/* Header: lead-in + room toggle */}
-        <div className="absolute left-[83px] top-[80px]">
+        {/* Header + feature as one top-anchored column. gap-20 keeps a fixed
+            80px between the "Coming next in" row and the title, so a long title
+            grows downward instead of creeping up toward the header. */}
+        <div className="absolute left-[83px] top-[80px] flex flex-col gap-20">
           <RoomToggle label={headerLabel} room={room} onCycle={cycleRoom} />
-        </div>
-
-        {/* Feature: live/next session, vertically centered in the left column */}
-        <div className="absolute left-[83px] top-[424px] -translate-y-1/2">
           <FeaturePanel key={replayKey} feature={feature} now={now} showCountdown={showCountdown} />
         </div>
 

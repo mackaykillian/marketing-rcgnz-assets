@@ -1,6 +1,6 @@
-import { Heart } from '@phosphor-icons/react';
-import type { RcgnzSpeaker } from '../../data/types';
-import { SPEAKER_STAGGER_MS } from './animation';
+import { Heart } from "@phosphor-icons/react";
+import type { RcgnzSpeaker } from "../../data/types";
+import { SPEAKER_STAGGER_MS } from "./animation";
 
 /** Fixed number of speaker slots — empty ones show a placeholder. */
 const SLOT_COUNT = 5;
@@ -12,8 +12,8 @@ function initials(name: string): string {
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase() ?? '')
-    .join('');
+    .map((word) => word[0]?.toUpperCase() ?? "")
+    .join("");
 }
 
 /**
@@ -21,7 +21,13 @@ function initials(name: string): string {
  * glow + translucent surface), an initials fallback when a speaker has no photo,
  * or a heart placeholder for an empty slot.
  */
-function SpeakerSlot({ speaker, size }: { speaker: RcgnzSpeaker | null; size: number }) {
+function SpeakerSlot({
+  speaker,
+  size,
+}: {
+  speaker: RcgnzSpeaker | null;
+  size: number;
+}) {
   if (!speaker) {
     return (
       <div
@@ -29,7 +35,16 @@ function SpeakerSlot({ speaker, size }: { speaker: RcgnzSpeaker | null; size: nu
         style={{ width: size, height: size }}
         aria-hidden="true"
       >
-        <Heart size={Math.round(size * 0.45)} weight="fill" className="text-white/80" />
+        <img
+          src={"../../public/backgrounds/speaker-placeholder.png"}
+          className="relative h-full w-full object-cover object-top"
+          loading="lazy"
+        />
+        <Heart
+          size={Math.round(size * 0.45)}
+          weight="fill"
+          className="text-white/80"
+        />
       </div>
     );
   }
@@ -73,7 +88,10 @@ interface SpeakerHeadshotsProps {
  * sessions with no speakers). Each slot fades in left-to-right on the shared
  * stagger.
  */
-export function SpeakerHeadshots({ speakers, baseDelayMs = 0 }: SpeakerHeadshotsProps) {
+export function SpeakerHeadshots({
+  speakers,
+  baseDelayMs = 0,
+}: SpeakerHeadshotsProps) {
   const slots: (RcgnzSpeaker | null)[] = Array.from(
     { length: SLOT_COUNT },
     (_, i) => speakers[i] ?? null,
@@ -85,7 +103,9 @@ export function SpeakerHeadshots({ speakers, baseDelayMs = 0 }: SpeakerHeadshots
         <div
           key={speaker?.id ?? `placeholder-${index}`}
           className="signage-fade"
-          style={{ animationDelay: `${baseDelayMs + index * SPEAKER_STAGGER_MS}ms` }}
+          style={{
+            animationDelay: `${baseDelayMs + index * SPEAKER_STAGGER_MS}ms`,
+          }}
         >
           <SpeakerSlot speaker={speaker} size={SLOT_SIZE} />
         </div>
