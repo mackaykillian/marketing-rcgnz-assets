@@ -73,6 +73,26 @@ ask Claude to _"regenerate the RCGNZ mock data"_ to re-pull the latest 2026 item
 via the Webflow MCP. Rooms are assigned during generation because the CMS
 `location` field is currently empty for this event.
 
+## Backgrounds (Spline Hana)
+
+Each session type gets an animated frosted-gradient background, exported from
+Spline Hana as a looping **WebM** (+ a first-frame **PNG** poster) in
+[`public/backgrounds/`](public/backgrounds):
+
+`mainstage`, `social`, `breakout`, and `default` (used for every other type —
+Workshop, Break, Registration, Ask the Experts, …).
+
+The background follows the **left-hand feature session**: its primary
+Session-Type tag is mapped to a file in
+[`backgrounds.ts`](src/components/SignageScreen/backgrounds.ts). Only the active
+background plays (one video at a time), and it only reloads when the type
+actually changes. A scrim keeps the white content legible; under
+`prefers-reduced-motion` the static poster is shown instead of the video.
+
+To swap one out, just replace `public/backgrounds/<type>.webm` (and its `.png`)
+— no code changes needed. WebM files are large; consider Git LFS if the repo
+grows.
+
 ## Fonts
 
 The design uses two proprietary Awardco fonts, **Crystal** (headings/body) and

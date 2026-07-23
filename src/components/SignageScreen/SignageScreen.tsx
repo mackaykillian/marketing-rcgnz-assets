@@ -8,7 +8,9 @@ import {
 import { useFitScale } from '../../lib/useFitScale';
 import { useNow } from '../../lib/useNow';
 import { SPEAKER_START_GAP_MS, titleAnimationDurationMs } from './animation';
+import { backgroundKeyForSession } from './backgrounds';
 import { FeaturePanel, FeatureSpeakers } from './FeaturePanel';
+import { SessionBackground } from './SessionBackground';
 import { OtherRoomsPanel } from './OtherRoomsPanel';
 import { RoomToggle } from './RoomToggle';
 
@@ -60,6 +62,7 @@ export function SignageScreen({ sessions, rooms, initialRoom, now: controlledNow
   // changes, so the entrance animation re-plays — but not on every clock tick.
   const speakerBaseDelayMs = titleAnimationDurationMs(feature.session?.title ?? '') + SPEAKER_START_GAP_MS;
   const replayKey = `${room}:${feature.session?.id ?? 'none'}`;
+  const bgKey = backgroundKeyForSession(feature.session);
 
   return (
     <div ref={frameRef} className="signage-frame">
@@ -67,6 +70,9 @@ export function SignageScreen({ sessions, rooms, initialRoom, now: controlledNow
         className="signage-stage bg-canvas font-heading text-white"
         style={{ transform: `scale(${scale})` }}
       >
+        {/* Session-type background (behind everything) */}
+        <SessionBackground bgKey={bgKey} />
+
         {/* Header: lead-in + room toggle */}
         <div className="absolute left-[83px] top-[80px]">
           <RoomToggle label={headerLabel} room={room} onCycle={cycleRoom} />
