@@ -1,7 +1,7 @@
 /** Timing constants shared across the signage entrance animations. */
 
 /** Per-character stagger for the title blur-in (left → right). */
-export const CHAR_STAGGER_MS = 50;
+export const CHAR_STAGGER_MS = 35;
 /** Must match the `.signage-char` animation duration in index.css. */
 export const CHAR_DURATION_MS = 550;
 /** Gap after the title finishes before the first speaker fades in. */
