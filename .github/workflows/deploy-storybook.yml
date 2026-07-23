@@ -9,14 +9,24 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with: { node-version: "20", cache: "npm" }
-      - run: npm ci
+      # `npm ci` fails here: optional wasm bindings (@oxc-resolver/binding-wasm32-wasi)
+      # declare @emnapi/* deps that macOS-generated lockfiles omit, so the lock isn't
+      # in sync on Linux. `npm install` resolves the tree fresh and sidesteps it.
+      - run: npm install --no-audit --no-fund
       - run: npm run build-storybook # Ensure this outputs to storybook-static
       - uses: actions/upload-pages-artifact@v3
         with: { path: "storybook-static" }
