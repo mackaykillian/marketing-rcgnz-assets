@@ -1,7 +1,6 @@
 import { MapPinArea } from '@phosphor-icons/react';
 import type { RoomFeature } from '../../lib/sessionSchedule';
 import { getPrimaryTag } from '../../lib/sessionSchedule';
-import { LiveBadge } from './LiveBadge';
 import { SessionTag } from './SessionTag';
 import { SessionTime } from './SessionTime';
 
@@ -15,7 +14,7 @@ function OtherRoomCard({
   now: Date;
   showCountdown: boolean;
 }) {
-  const { room, session, status } = feature;
+  const { room, session } = feature;
   const tag = session ? getPrimaryTag(session) : null;
 
   return (
@@ -28,18 +27,15 @@ function OtherRoomCard({
           </span>
         </div>
 
-        {session &&
-          (status === 'live' ? (
-            <LiveBadge size="sm" />
-          ) : (
-            <SessionTime
-              startIso={session.startDateTime}
-              endIso={session.endDateTime}
-              now={now}
-              showCountdown={showCountdown}
-              className="font-heading text-h6 tracking-[-0.2px] text-white"
-            />
-          ))}
+        {session && (
+          <SessionTime
+            startIso={session.startDateTime}
+            endIso={session.endDateTime}
+            now={now}
+            showCountdown={showCountdown}
+            className="font-heading text-h6 tracking-[-0.2px] text-white"
+          />
+        )}
       </div>
 
       <p className="line-clamp-2 font-heading text-h4 leading-[1.35] tracking-[-0.31px] text-white">

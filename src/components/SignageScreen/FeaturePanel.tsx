@@ -1,7 +1,6 @@
 import type { RoomFeature } from '../../lib/sessionSchedule';
 import { getPrimaryTag } from '../../lib/sessionSchedule';
 import { BlurInText } from './BlurInText';
-import { LiveBadge } from './LiveBadge';
 import { SessionTag } from './SessionTag';
 import { SessionTime } from './SessionTime';
 import { SpeakerHeadshots } from './SpeakerHeadshots';
@@ -15,11 +14,11 @@ interface FeaturePanelProps {
 
 /**
  * The main left-hand feature: the live-or-next session for the current room —
- * big title, then either a LIVE badge (when live) or the session time (which
- * crossfades between the range and a countdown), then the session-type tag.
+ * big title, then the session time (which crossfades between the range and a
+ * "Starting in …" countdown / "LIVE NOW"), then the session-type tag.
  */
 export function FeaturePanel({ feature, now, showCountdown }: FeaturePanelProps) {
-  const { session, status, room } = feature;
+  const { session, room } = feature;
 
   if (!session) {
     return (
@@ -38,17 +37,13 @@ export function FeaturePanel({ feature, now, showCountdown }: FeaturePanelProps)
       </h1>
 
       <div className="flex items-center gap-5">
-        {status === 'live' ? (
-          <LiveBadge size="lg" />
-        ) : (
-          <SessionTime
-            startIso={session.startDateTime}
-            endIso={session.endDateTime}
-            now={now}
-            showCountdown={showCountdown}
-            className="font-heading text-h4 tracking-[-0.31px] text-body"
-          />
-        )}
+        <SessionTime
+          startIso={session.startDateTime}
+          endIso={session.endDateTime}
+          now={now}
+          showCountdown={showCountdown}
+          className="font-heading text-h4 tracking-[-0.31px] text-body"
+        />
       </div>
 
       {tag && (
