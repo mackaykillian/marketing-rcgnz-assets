@@ -1,4 +1,5 @@
 import type { RcgnzSpeaker } from '../../data/types';
+import { SPEAKER_STAGGER_MS } from './animation';
 
 function initials(name: string): string {
   return name
@@ -46,16 +47,24 @@ function Headshot({ speaker, size = 140 }: { speaker: RcgnzSpeaker; size?: numbe
 interface SpeakerHeadshotsProps {
   speakers: RcgnzSpeaker[];
   max?: number;
+  /** Delay before the first headshot fades in (so it starts after the title). */
+  baseDelayMs?: number;
 }
 
 /** Row of speaker headshots for the feature panel (caps at `max`). */
-export function SpeakerHeadshots({ speakers, max = 4 }: SpeakerHeadshotsProps) {
+export function SpeakerHeadshots({ speakers, max = 4, baseDelayMs = 0 }: SpeakerHeadshotsProps) {
   const shown = speakers.slice(0, max);
   if (shown.length === 0) return null;
   return (
     <div className="flex items-center gap-[17.57px]">
-      {shown.map((speaker) => (
-        <Headshot key={speaker.id} speaker={speaker} />
+      {shown.map((speaker, index) => (
+        <div
+          key={speaker.id}
+          className="signage-fade"
+          style={{ animationDelay: `${baseDelayMs + index * SPEAKER_STAGGER_MS}ms` }}
+        >
+          <Headshot speaker={speaker} />
+        </div>
       ))}
     </div>
   );

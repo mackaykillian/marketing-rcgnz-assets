@@ -1,6 +1,7 @@
 import { Timer } from '@phosphor-icons/react';
 import type { RoomFeature } from '../../lib/sessionSchedule';
 import { formatCountdown, formatTimeRange, getPrimaryTag } from '../../lib/sessionSchedule';
+import { BlurInText } from './BlurInText';
 import { LiveBadge } from './LiveBadge';
 import { SessionTag } from './SessionTag';
 import { SpeakerHeadshots } from './SpeakerHeadshots';
@@ -32,7 +33,7 @@ export function FeaturePanel({ feature, now }: FeaturePanelProps) {
   return (
     <div className="flex w-[1023px] flex-col gap-5">
       <h1 className="font-heading text-display leading-[1.2] tracking-[-0.8px] text-white [text-wrap:balance]">
-        {session.title}
+        <BlurInText text={session.title} />
       </h1>
 
       <div className="flex items-center gap-5">
@@ -64,6 +65,12 @@ export function FeaturePanel({ feature, now }: FeaturePanelProps) {
 }
 
 /** The bottom-left row of speaker headshots for the featured session. */
-export function FeatureSpeakers({ feature }: { feature: RoomFeature }) {
-  return <SpeakerHeadshots speakers={feature.session?.speakers ?? []} />;
+export function FeatureSpeakers({
+  feature,
+  baseDelayMs,
+}: {
+  feature: RoomFeature;
+  baseDelayMs?: number;
+}) {
+  return <SpeakerHeadshots speakers={feature.session?.speakers ?? []} baseDelayMs={baseDelayMs} />;
 }

@@ -70,6 +70,51 @@
   }
 }
 
+/*
+ * Subtle entrance animations. The title blurs + fades in per character (a nod to
+ * the RCGNZ frosted-glass branding); speaker headshots fade in afterwards. Both
+ * are disabled under prefers-reduced-motion. Per-element `animation-delay` is set
+ * inline by the components to create the left-to-right stagger.
+ */
+.signage-char {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes signage-char-in {
+    from {
+      opacity: 0;
+      filter: blur(12px);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  @keyframes signage-fade-in {
+    from {
+      opacity: 0;
+      filter: blur(8px);
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+  }
+
+  /* Duration here must match CHAR_DURATION_MS in animation.tsx. */
+  .signage-char {
+    animation: signage-char-in 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  .signage-fade {
+    animation: signage-fade-in 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+}
+
 html,
 body,
 #root {

@@ -7,6 +7,7 @@ import {
 } from '../../lib/sessionSchedule';
 import { useFitScale } from '../../lib/useFitScale';
 import { useNow } from '../../lib/useNow';
+import { SPEAKER_START_GAP_MS, titleAnimationDurationMs } from './animation';
 import { FeaturePanel, FeatureSpeakers } from './FeaturePanel';
 import { OtherRoomsPanel } from './OtherRoomsPanel';
 import { RoomToggle } from './RoomToggle';
@@ -54,6 +55,12 @@ export function SignageScreen({ sessions, rooms, initialRoom, now: controlledNow
   const headerLabel = feature.status === 'live' ? 'Live now in' : 'Coming next in';
   const cycleRoom = () => setRoomIndex((i) => (roomList.length ? (i + 1) % roomList.length : 0));
 
+  // Speakers begin fading in once the title has finished its blur-in. The
+  // `replayKey` remounts the animated pieces when the featured session (or room)
+  // changes, so the entrance animation re-plays — but not on every clock tick.
+  const speakerBaseDelayMs = titleAnimationDurationMs(feature.session?.title ?? '') + SPEAKER_START_GAP_MS;
+  const replayKey = `${room}:${feature.session?.id ?? 'none'}`;
+
   return (
     <div ref={frameRef} className="signage-frame">
       <div
@@ -67,12 +74,12 @@ export function SignageScreen({ sessions, rooms, initialRoom, now: controlledNow
 
         {/* Feature: live/next session, vertically centered in the left column */}
         <div className="absolute left-[83px] top-[424px] -translate-y-1/2">
-          <FeaturePanel feature={feature} now={now} />
+          <FeaturePanel key={replayKey} feature={feature} now={now} />
         </div>
 
         {/* Speaker headshots pinned near the bottom-left */}
         <div className="absolute left-[80px] top-[860px]">
-          <FeatureSpeakers feature={feature} />
+          <FeatureSpeakers key={replayKey} feature={feature} baseDelayMs={speakerBaseDelayMs} />
         </div>
 
         {/* "In other rooms …" heading */}
