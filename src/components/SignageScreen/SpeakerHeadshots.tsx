@@ -1,5 +1,11 @@
+import { Heart } from '@phosphor-icons/react';
 import type { RcgnzSpeaker } from '../../data/types';
 import { SPEAKER_STAGGER_MS } from './animation';
+
+/** Fixed number of speaker slots — empty ones show a placeholder. */
+const SLOT_COUNT = 5;
+const SLOT_SIZE = 160;
+const SLOT_GAP = 20;
 
 function initials(name: string): string {
   return name
@@ -11,12 +17,23 @@ function initials(name: string): string {
 }
 
 /**
- * A single 140×140 stylized headshot. Faithful to the Figma frame (soft glow +
- * translucent surface) without cloning its decorative sub-shapes. Falls back to
- * the speaker's initials when there's no photo (common for not-yet-published
- * speakers in the CMS).
+ * A single 160×160 slot: a speaker headshot (faithful to the Figma frame — soft
+ * glow + translucent surface), an initials fallback when a speaker has no photo,
+ * or a heart placeholder for an empty slot.
  */
-function Headshot({ speaker, size = 140 }: { speaker: RcgnzSpeaker; size?: number }) {
+function SpeakerSlot({ speaker, size }: { speaker: RcgnzSpeaker | null; size: number }) {
+  if (!speaker) {
+    return (
+      <div
+        className="flex shrink-0 items-center justify-center bg-white/10"
+        style={{ width: size, height: size }}
+        aria-hidden="true"
+      >
+        <Heart size={Math.round(size * 0.45)} weight="fill" className="text-white/80" />
+      </div>
+    );
+  }
+
   return (
     <div
       className="relative shrink-0 overflow-hidden bg-white/10"
@@ -46,24 +63,33 @@ function Headshot({ speaker, size = 140 }: { speaker: RcgnzSpeaker; size?: numbe
 
 interface SpeakerHeadshotsProps {
   speakers: RcgnzSpeaker[];
-  max?: number;
-  /** Delay before the first headshot fades in (so it starts after the title). */
+  /** Delay before the first slot fades in (so it starts after the title). */
   baseDelayMs?: number;
 }
 
-/** Row of speaker headshots for the feature panel (caps at `max`). */
-export function SpeakerHeadshots({ speakers, max = 4, baseDelayMs = 0 }: SpeakerHeadshotsProps) {
-  const shown = speakers.slice(0, max);
-  if (shown.length === 0) return null;
+/**
+ * The feature's speaker row — always `SLOT_COUNT` slots. Real speakers fill from
+ * the left; the rest are heart placeholders so the row never looks sparse. Each
+ * slot fades in left-to-right on the shared stagger. Hidden entirely when the
+ * session has no speakers at all.
+ */
+export function SpeakerHeadshots({ speakers, baseDelayMs = 0 }: SpeakerHeadshotsProps) {
+  if (speakers.length === 0) return null;
+
+  const slots: (RcgnzSpeaker | null)[] = Array.from(
+    { length: SLOT_COUNT },
+    (_, i) => speakers[i] ?? null,
+  );
+
   return (
-    <div className="flex items-center gap-[17.57px]">
-      {shown.map((speaker, index) => (
+    <div className="flex items-center" style={{ gap: SLOT_GAP }}>
+      {slots.map((speaker, index) => (
         <div
-          key={speaker.id}
+          key={speaker?.id ?? `placeholder-${index}`}
           className="signage-fade"
           style={{ animationDelay: `${baseDelayMs + index * SPEAKER_STAGGER_MS}ms` }}
         >
-          <Headshot speaker={speaker} />
+          <SpeakerSlot speaker={speaker} size={SLOT_SIZE} />
         </div>
       ))}
     </div>
